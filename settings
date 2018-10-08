@@ -1,0 +1,7 @@
+{
+	"cities": [
+		"London", "Paris", "Navinki"
+	],
+	"db_name": "weather19.db",
+	"refresh_period": "10"
+}
