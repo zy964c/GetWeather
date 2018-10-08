@@ -9,7 +9,7 @@ from collections import defaultdict, abc
 from actions import Settings
 
 
-api_key = 'e6f1dd0f3a1cd2e234ba71bdd90e8e2d'
+api_key = 'fill this out'
 
 def get_data(payload):
 
