@@ -10,7 +10,7 @@ from threading import Thread, Event
 from collections import defaultdict, abc
 from actions import Settings
 
-api_key = 'e6f1dd0f3a1cd2e234ba71bdd90e8e2d'
+api_key = 'fill_this_out'
 LOG_FILENAME = 'log'
 
 my_logger = logging.getLogger('my_logger')

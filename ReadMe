@@ -1,0 +1,6 @@
+# GetWeather
+Helps getting weather data from openweathermap.org
+
+1. Install requirements.
+2. run `get_weather.py`.
+3. specify parameters in `settings`.
