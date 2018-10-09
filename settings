@@ -1,7 +1,9 @@
 {
 	"cities": [
-		"London", "Paris", "Navinki"
+		"Moskva", 
+		"Novosibirsk",
+		"Krasnodar"
 	],
-	"db_name": "weather19.db",
-	"refresh_period": "10"
+	"db_name": "weather3.db",
+	"refresh_period": "60"
 }

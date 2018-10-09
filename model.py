@@ -1,10 +1,18 @@
 import sqlalchemy
+import logging
+
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, relationship
-from sqlalchemy import Column, Integer, String, Float, Table, Text, ForeignKey, create_engine
+from sqlalchemy import Column, Integer, String, Float, Table, Text, ForeignKey, \
+create_engine, desc
 from actions import Settings
 
 
+model_logger = logging.getLogger('my_logger.model')
+#handler_model = logging.StreamHandler()
+formatter_model = logging.Formatter('%(asctime)s - %(name)s - %(threadName)s - %(levelname)s - %(message)s')
+#model_logger.addHandler(handler_model)
+#model_logger.setFormatter(formatter_model)
 Base = declarative_base()
 
 class WeatherAll(Base):
@@ -51,9 +59,6 @@ class Weather(Base):
     main = Column(String)
     description = Column(String)
     icon = Column(String)
-    #weather_id = Column(Integer, ForeignKey('weather_all.id'))
-
-    #forecast = relationship('Weather_all', back_populates='weather_types')
     weathers = relationship('WeatherAll',
                             secondary=weather_types,
                             back_populates='weathers')
@@ -65,9 +70,10 @@ WeatherAll.weathers = relationship('Weather',
                                    back_populates='weathers')
 
 def add_record(weather_all_params, data):
-    engine = create_engine('sqlite:////tmp/' + Settings.options['db_name'], echo=True)
+    engine = create_engine('sqlite:///' + Settings.options['db_name'], echo=False)
     if not engine.dialect.has_table(engine, 'weather_all'):
         Base.metadata.create_all(engine)
+        model_logger.info('created new database {}'.format(Settings.options['db_name']))
     Session = sessionmaker(bind=engine)
     session = Session()
     data_location = {'lon': data['coord']['lon'],
@@ -81,7 +87,7 @@ def add_record(weather_all_params, data):
         location = session.query(Location).filter_by(name=data_location['name']).one()
     location.weathers_all.append(WeatherAll(**weather_all_params))
     session.add(location)
-    last_weather = session.query(WeatherAll).order_by('-id').first()
+    last_weather = session.query(WeatherAll).order_by(desc(WeatherAll.id)).first()
     for weather in data['weather']:
         weather_count = session.query(Weather).filter_by(id=weather['id']).count()
         if weather_count != 0:
@@ -89,3 +95,4 @@ def add_record(weather_all_params, data):
         last_weather.weathers.append(Weather(**weather))
     session.commit()
     session.close()
+    model_logger.info('added new record to db')

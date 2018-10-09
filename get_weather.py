@@ -2,21 +2,34 @@ import requests
 import model
 import json
 import time
+import logging
+import logging.handlers
 
-from pprint import pprint
+from pprint import pprint, pformat
 from threading import Thread, Event
 from collections import defaultdict, abc
 from actions import Settings
 
-
 api_key = 'fill this out'
+LOG_FILENAME = 'log'
+
+my_logger = logging.getLogger('my_logger')
+my_logger.setLevel(logging.DEBUG)
+handler = logging.handlers.RotatingFileHandler(
+              LOG_FILENAME, maxBytes=5*10**6, backupCount=5)
+handler_console = logging.StreamHandler()
+handler_console.setLevel(logging.INFO)
+formatter = logging.Formatter('%(asctime)s - %(name)s - %(threadName)s - %(levelname)s - %(message)s')
+handler.setFormatter(formatter)
+handler_console.setFormatter(formatter)
+my_logger.addHandler(handler)
+my_logger.addHandler(handler_console)
 
 def get_data(payload):
 
     r = requests.get('http://api.openweathermap.org/data/2.5/group', timeout=3,
         params=payload)   
     recieved_data = r.json()
-    #pprint(recieved_data)
     return recieved_data
 
 def read_settings(fp, timeout, e):
@@ -29,6 +42,7 @@ def read_settings(fp, timeout, e):
             old_timeout = Settings.options['refresh_period']
             if settings != Settings.options:
                 Settings.update_opts(settings)
+                my_logger.info('Settings updated')
                 if old_timeout != Settings.options['refresh_period']:
                     e.set()
                     e.clear()
@@ -40,11 +54,14 @@ def main():
             settings = json.load(s)
             Settings.update_opts(settings)
     read_cities()
+    my_logger.info('cities data read complete') 
     e = Event()
     t = Thread(target=read_settings, args=('settings', 10, e,), daemon=True)
     t1 = Thread(target=main_loop, args=(e,), daemon=True)
     t.start()
     t1.start()
+    t.join()
+    t1.join()
     
 def main_loop(e):
 
@@ -54,12 +71,12 @@ def main_loop(e):
             params = {'id': ','.join(cities), 'APPID': api_key}
             try:
                 data_dl = get_data(params)
-            except requests.exceptions.RequestException as n:
-                print(n)
+            except requests.exceptions.RequestException:
+                my_logger.exception('RequestException')
                 pass
             else:
                 for data_raw in data_dl['list']:
-                    pprint(data_raw)    
+                    my_logger.debug(pformat(data_raw)) 
                     data = defaultdict(dict, data_raw)
                     data_weather_all = {'dt': data['dt'],
                                         'base': data['base'],
@@ -102,3 +119,6 @@ def filter_input(mapping):
     for key in empty_keys:
         mapping.pop(key)
     return mapping
+
+if __name__ == "__main__":
+    main()
