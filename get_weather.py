@@ -10,7 +10,7 @@ from threading import Thread, Event
 from collections import defaultdict, abc
 from actions import Settings
 
-api_key = 'fill this out'
+api_key = 'e6f1dd0f3a1cd2e234ba71bdd90e8e2d'
 LOG_FILENAME = 'log'
 
 my_logger = logging.getLogger('my_logger')
@@ -27,9 +27,10 @@ my_logger.addHandler(handler_console)
 
 def get_data(payload):
 
-    r = requests.get('http://api.openweathermap.org/data/2.5/group', timeout=3,
+    r = requests.get('http://api.openweathermap.org/data/2.5/group', timeout=1,
         params=payload)   
     recieved_data = r.json()
+    my_logger.debug(recieved_data)
     return recieved_data
 
 def read_settings(fp, timeout, e):
@@ -71,9 +72,10 @@ def main_loop(e):
             params = {'id': ','.join(cities), 'APPID': api_key}
             try:
                 data_dl = get_data(params)
+                if data_dl.get('cod', None) == 401:
+                    raise(requests.exceptions.RequestException('api key is incorrect'))
             except requests.exceptions.RequestException:
                 my_logger.exception('RequestException')
-                pass
             else:
                 for data_raw in data_dl['list']:
                     my_logger.debug(pformat(data_raw)) 

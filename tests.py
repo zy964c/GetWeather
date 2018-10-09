@@ -1,24 +1,18 @@
-test_data = {'base': 'stations',
-         'clouds': {'all': 0},
-         'cod': 200,
-         'coord': {'lat': 55.76, 'lon': 37.61},
-         'dt': 1538728200,
-         'id': 524894,
-         'main': {'humidity': 65,
-                  'pressure': 1019,
-                  'temp': 278.15,
-                  'temp_max': 278.15,
-                  'temp_min': 278.15},
-         'name': 'Moskva',
-         'sys': {'country': 'RU',
-                 'id': 7323,
-                 'message': 0.002,
-                 'sunrise': 1538710834,
-                 'sunset': 1538751250,
-                 'type': 1},
-         'visibility': 10000,
-         'weather': [{'description': 'clear sky',
-                      'icon': '01d',
-                      'id': 800,
-                      'main': 'Clear'}],
-         'wind': {'deg': 280, 'speed': 6}}
+import unittest
+from get_weather import parse_cities, read_cities
+from actions import Settings
+
+class TestData(unittest.TestCase):
+    
+    def test_parse_cities(self):
+        read_cities()
+        cities = [
+        "Moskva", 
+        "Novosibirsk",
+        "Krasnodar"
+        ]
+        city_list = parse_cities(cities)
+        self.assertEqual(city_list, ['1220988', '1496747', '542420'])
+
+if __name__ == "__main__":
+    unittest.main()

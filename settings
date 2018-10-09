@@ -4,6 +4,6 @@
 		"Novosibirsk",
 		"Krasnodar"
 	],
-	"db_name": "weather3.db",
-	"refresh_period": "60"
+	"db_name": "weather.db",
+	"refresh_period": "3600"
 }
