@@ -16,7 +16,7 @@ LOG_FILENAME = 'log'
 my_logger = logging.getLogger('my_logger')
 my_logger.setLevel(logging.DEBUG)
 handler = logging.handlers.RotatingFileHandler(
-              LOG_FILENAME, maxBytes=5*10**6, backupCount=5)
+              LOG_FILENAME, maxBytes=1*10**6, backupCount=5)
 handler_console = logging.StreamHandler()
 handler_console.setLevel(logging.INFO)
 formatter = logging.Formatter('%(asctime)s - %(name)s - %(threadName)s - %(levelname)s - %(message)s')
@@ -30,7 +30,6 @@ def get_data(payload):
     r = requests.get('http://api.openweathermap.org/data/2.5/group', timeout=1,
         params=payload)   
     recieved_data = r.json()
-    my_logger.debug(recieved_data)
     return recieved_data
 
 def read_settings(fp, timeout, e):
@@ -51,13 +50,13 @@ def read_settings(fp, timeout, e):
 
 def main():
 
-    with open('settings') as s:
+    with open('settings.json') as s:
             settings = json.load(s)
             Settings.update_opts(settings)
     read_cities()
     my_logger.info('cities data read complete') 
     e = Event()
-    t = Thread(target=read_settings, args=('settings', 10, e,), daemon=True)
+    t = Thread(target=read_settings, args=('settings.json', 10, e,), daemon=True)
     t1 = Thread(target=main_loop, args=(e,), daemon=True)
     t.start()
     t1.start()

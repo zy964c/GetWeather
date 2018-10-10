@@ -9,10 +9,7 @@ from actions import Settings
 
 
 model_logger = logging.getLogger('my_logger.model')
-#handler_model = logging.StreamHandler()
 formatter_model = logging.Formatter('%(asctime)s - %(name)s - %(threadName)s - %(levelname)s - %(message)s')
-#model_logger.addHandler(handler_model)
-#model_logger.setFormatter(formatter_model)
 Base = declarative_base()
 
 class WeatherAll(Base):
