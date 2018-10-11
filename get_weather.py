@@ -56,12 +56,10 @@ def main():
     read_cities()
     my_logger.info('cities data read complete') 
     e = Event()
-    t = Thread(target=read_settings, args=('settings.json', 10, e,), daemon=True)
-    t1 = Thread(target=main_loop, args=(e,), daemon=True)
+    t = Thread(target=read_settings, args=('settings.json', 10, e,))
+    t1 = Thread(target=main_loop, args=(e,))
     t.start()
     t1.start()
-    t.join()
-    t1.join()
     
 def main_loop(e):
 
@@ -100,6 +98,7 @@ def main_loop(e):
                     model.add_record(data_filtered, data_raw)
             finally:
                 e.wait(timeout=int(Settings.options['refresh_period']))
+                
 def read_cities():
     with open('city.list.json') as s:
         all_cities_data = json.load(s)

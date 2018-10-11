@@ -5,5 +5,5 @@
 		"Krasnodar"
 	],
 	"db_name": "weather.db",
-	"refresh_period": "60"
+	"refresh_period": "3600"
 }
